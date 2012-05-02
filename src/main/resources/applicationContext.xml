@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- 	From STDIN to Rabbit -->
+		
+	<int-stream:stdin-channel-adapter id="consoleIn" channel="toRabbit">
+		<int:poller fixed-delay="1000" max-messages-per-poll="1"/>
+	</int-stream:stdin-channel-adapter>		
+		
+	<int:channel id="toRabbit"/>
+	
+	<int-amqp:outbound-channel-adapter channel="toRabbit" amqp-template="amqpTemplate" exchange-name="notifications.exchange" routing-key="notifications.binding"/>
+	
+	<!-- 	Infrastructure -->
+	<rabbit:connection-factory id="connectionFactory"/>
+	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory"/>
+	<rabbit:admin connection-factory="connectionFactory"/>
+	<rabbit:queue name="notifications.queue"/>
+	
+	<rabbit:direct-exchange name="notifications.exchange">
+		<rabbit:bindings>
+			<rabbit:binding queue="notifications.queue" key="notifications.binding"/>
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+	
+</beans> 
