@@ -19,18 +19,13 @@
 		
 	<int:channel id="toRabbit"/>
 	
-	<int-amqp:outbound-channel-adapter channel="toRabbit" amqp-template="amqpTemplate" exchange-name="notifications.exchange" routing-key="notifications.binding"/>
+	<int-amqp:outbound-channel-adapter channel="toRabbit" amqp-template="amqpTemplate" exchange-name="notifications.exchange"/>
 	
-	<!-- 	Infrastructure -->
+<!-- 		Infrastructure -->
 	<rabbit:connection-factory id="connectionFactory"/>
 	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory"/>
 	<rabbit:admin connection-factory="connectionFactory"/>
-	<rabbit:queue name="notifications.queue"/>
 	
-	<rabbit:direct-exchange name="notifications.exchange">
-		<rabbit:bindings>
-			<rabbit:binding queue="notifications.queue" key="notifications.binding"/>
-		</rabbit:bindings>
-	</rabbit:direct-exchange>
+	<rabbit:fanout-exchange name="notifications.exchange"/>
 	
 </beans> 

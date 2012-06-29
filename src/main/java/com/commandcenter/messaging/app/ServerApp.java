@@ -8,6 +8,7 @@ public class ServerApp {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 		
 		ctx.registerShutdownHook();
+		
 		System.out.println("Server");
 	}
 }
